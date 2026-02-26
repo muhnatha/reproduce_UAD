@@ -1,4 +1,4 @@
-dataset_bg_dir: None
+dataset_bg_dir: datasets/bg_imgs_bvs_full
 model:
   in_channels: 384
   filters: [256, 64, 1]
