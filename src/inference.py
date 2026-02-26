@@ -81,56 +81,92 @@ class AffordanceInference:
         
         return sim_np
 
+import argparse
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+from pathlib import Path
+
+# Assuming these are imported from your project modules
+# from your_module import load_config, get_text_embedding_options, AffordanceInference
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Inference script for robotic affordance prediction.")
     parser.add_argument("--config", required=True, help="Path to config YAML file")
     parser.add_argument("--checkpoint", required=True, help="Path to model checkpoint")
+    parser.add_argument("--image_path", type=str, help="Path to the input image (optional, defaults to example image)")
+    parser.add_argument("--text_query", type=str, default="twist open", help="Text query for affordance (e.g., 'twist open')")
     
     args = parser.parse_args()
     
-    # Load config for additional settings
-    cfg = load_config(args.config)
-    
-    ## ===== Example usage ===== ##
-    image_path = os.path.join(os.path.dirname(__file__), '..', 'examples', 'example_image.png')
-    text_query = "twist open"
-    
-    # Load image
-    img = np.array(Image.open(image_path).convert("RGB"))
-    
-    # Get text embedding function
+    # Load configuration
+    try:
+        cfg = load_config(args.config)
+    except Exception as e:
+        print(f"Error loading config file: {e}")
+        return
+
+    # Resolve Image Path Logic
+    if args.image_path:
+        image_path = Path(args.image_path)
+    else:
+        # Fallback to the default example relative to this script
+        image_path = Path(__file__).parent.parent / 'examples' / 'example_image.png'
+
+    try:
+        if not image_path.exists():
+            raise FileNotFoundError(f"No image found at: {image_path.resolve()}")
+            
+        img_pil = Image.open(image_path).convert("RGB")
+        img = np.array(img_pil)
+        print(f"Successfully loaded image: {image_path.name}")
+
+    except FileNotFoundError as e:
+        print(f"File Error: {e}")
+        print("Suggestion: Check the path or provide one using --image_path.")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred while opening the image: {e}")
+        return
+
+    # nitialize Components
     text_embedding_option = cfg.get("text_embedding", "embeddings_oai")
     print(f"Using text embedding option: {text_embedding_option}")
+    
     text_embedding_func = get_text_embedding_options(text_embedding_option)
-
-    # Initialize inference
     inference = AffordanceInference(args.config, args.checkpoint, text_embedding_func)
     
-    # Post-processing threshold for shutting down low affordance regions
+    # Post-processing threshold
     shutdown_thresh = cfg.get("thresh", 0.5)
     
-    # Run prediction
-    result = inference.predict(img, text_query, shutdown_thresh)
+    # Run Prediction
+    print(f"Running inference for query: '{args.text_query}'...")
+    result = inference.predict(img, args.text_query, shutdown_thresh)
+    print(f"Predicted affordance map shape: {result.shape}")
     
-    print(f"Predicted affordance map for '{text_query}' with shape {result.shape}")
-    
-    # Display result
+    # Visualization and Saving
     plt.figure(figsize=(12, 4))
+    
     plt.subplot(1, 2, 1)
     plt.imshow(img)
-    plt.title("Input Image")
+    plt.title(f"Input: {image_path.name}")
     plt.axis('off')
     
     plt.subplot(1, 2, 2)
     plt.imshow(result, cmap='hot')
-    plt.title(f"Affordance Map: '{text_query}'")
+    plt.title(f"Affordance: '{args.text_query}'")
     plt.axis('off')
     
     plt.tight_layout()
     
+    # Save the output
+    output_dir = Path(__file__).parent.parent / 'img_results'
+    output_dir.mkdir(parents=True, exist_ok=True)
+    save_path = output_dir / 'affordance_map_output.png'
+    
+    plt.savefig(save_path)
+    print(f"Result saved to: {save_path.resolve()}")
     # plt.show()
-    plt.savefig(os.path.join(os.path.dirname(__file__), '..', 'examples', 'affordance_map.png'))
-
 
 if __name__ == "__main__":
     main()
