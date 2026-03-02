@@ -12,14 +12,14 @@ model:
 text_embedding: "embeddings_st"
 
 optim:
-  lr: 0.002
+  lr: 0.001
   weight_decay: 0.0
   step_size: 10
   gamma: 0.75
 
 trainer:
   batch_size: 32
-  num_epochs: 50
+  num_epochs: 30
   save_every: 5
   val_every: 5
   random_pad: true
