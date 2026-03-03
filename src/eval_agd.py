@@ -92,7 +92,7 @@ def eval():
     cfg = load_config(args.config)
 
     # build inference
-    text_embedding_option = "embeddings_oai"
+    text_embedding_option = "embeddings_st"
     print(f"Using text embedding option: {text_embedding_option}")
     text_embedding_func = get_text_embedding_options(text_embedding_option)
     inference = AffordanceInference(args.config, args.checkpoint, text_embedding_func)
