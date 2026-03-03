@@ -14,6 +14,7 @@ import numpy as np
 
 from sentence_transformers import SentenceTransformer
 sentence_transformer_model = SentenceTransformer("all-MiniLM-L6-v2")
+bge_m3_model = SentenceTransformer("BAAI/bge-m3") 
 
 
 ##############################################
@@ -27,6 +28,8 @@ def get_text_embedding_options(option="embeddings_oai"):
         return get_text_embedding
     elif option == "embeddings_st":
         return get_text_embedding_sentence_transformer
+    elif option == "embeddings_bge_m3":                                                                                                                                                  
+             return get_text_embedding_bge_m3 
     else:
         raise ValueError(f"Invalid option: {option}")
 
@@ -45,6 +48,13 @@ def get_text_embedding_sentence_transformer(text, model_name="all-MiniLM-L6-v2")
     # model = SentenceTransformer(model_name)
     embedding = sentence_transformer_model.encode(text) # shape (D,)
     return embedding
+
+def get_text_embedding_bge_m3(text):                                                                                                             
+    """                                                                                                                                                                                  
+    Get text embedding with BGE-M3 model                                                                                                                                                 
+    """                                                                                                                                                                                  
+    embedding = bge_m3_model.encode(text)  # shape (D,), returns 1024-dim                                                                                                                
+    return embedding  
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
