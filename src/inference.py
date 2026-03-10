@@ -162,7 +162,7 @@ def main():
     # Save the output
     output_dir = Path(__file__).parent.parent / 'img_results'
     output_dir.mkdir(parents=True, exist_ok=True)
-    save_path = output_dir / 'affordance_map_output.png'
+    save_path = output_dir / f"{image_path.stem}_affordance_map.png"   
     
     plt.savefig(save_path)
     print(f"Result saved to: {save_path.resolve()}")

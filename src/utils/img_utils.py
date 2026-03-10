@@ -124,10 +124,20 @@ def load_pretrained_dino(model_type='dinov2_vitl14', use_registers=False, torch_
     use_registers: bool, whether to use registers
     torch_path: str, path to torch model cache directory (optional)
     '''
-    # specify path to download pretrained model weights
-    if torch_path is not None:
-        os.environ['TORCH_HOME'] = torch_path
-
+    # Determine local path to use
+    local_dinov2_path = None
+    
+    if torch_path is not None and os.path.exists(os.path.join(torch_path, 'hubconf.py')):
+        # Use provided torch_path if it contains hubconf.py
+        local_dinov2_path = torch_path
+    
+    # Default: check for local_dinov2 in project root
+    if local_dinov2_path is None:
+        project_root = os.path.join(os.path.dirname(__file__), '..', '..')
+        default_local = os.path.join(project_root, 'local_dinov2')
+        if os.path.exists(os.path.join(default_local, 'hubconf.py')):
+            local_dinov2_path = default_local
+    
     # load model
     if model_type not in ['dinov2_vits14', 'dinov2_vitb14', 'dinov2_vitl14', 'dinov2_vitg14', 'dinov2_vits14_reg', 'dinov2_vitb14_reg', 'dinov2_vitl14_reg', 'dinov2_vitg14_reg']:
         raise ValueError('Invalid model type', model_type)
@@ -135,7 +145,15 @@ def load_pretrained_dino(model_type='dinov2_vitl14', use_registers=False, torch_
     if use_registers and 'reg' not in model_type:
         model_type = model_type + '_reg'
     
-    dinov2 = torch.hub.load('facebookresearch/dinov2', model_type).eval().cuda()
+    # Load from local path if available
+    if local_dinov2_path is not None:
+        print(f"Loading DINOv2 from local: {local_dinov2_path}")
+        dinov2 = torch.hub.load(local_dinov2_path, model_type, source='local').eval().cuda()
+    else:
+        # Fallback to online
+        print("Loading DINOv2 from online (facebookresearch/dinov2)")
+        dinov2 = torch.hub.load('facebookresearch/dinov2', model_type).eval().cuda()
+    
     print(f"Loaded {model_type} model")
     
     return dinov2

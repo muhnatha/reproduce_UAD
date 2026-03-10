@@ -106,7 +106,7 @@ class Trainer:
         self.criterion = torch.nn.BCEWithLogitsLoss()
 
         # ---------------- DINO encoder ------------------------------
-        self.dino = load_pretrained_dino('dinov2_vits14', use_registers=True, torch_path=cfg["torch_home"]).to(self.device).eval()
+        self.dino = load_pretrained_dino('dinov2_vitl14', use_registers=True, torch_path=cfg["torch_home"]).to(self.device).eval()
 
         # ---------------- Logging / dirs ----------------------------
         date = datetime.datetime.now().strftime("%Y%m%d")
