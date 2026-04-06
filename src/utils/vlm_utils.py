@@ -15,6 +15,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 sentence_transformer_model = SentenceTransformer("all-MiniLM-L6-v2")
 bge_m3_model = SentenceTransformer("BAAI/bge-m3") 
+mxbai_model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1")
 
 
 ##############################################
@@ -29,7 +30,9 @@ def get_text_embedding_options(option="embeddings_oai"):
     elif option == "embeddings_st":
         return get_text_embedding_sentence_transformer
     elif option == "embeddings_bge_m3":                                                                                                                                                  
-             return get_text_embedding_bge_m3 
+        return get_text_embedding_bge_m3 
+    elif option == "embeddings_mxbai":
+        return get_text_embedding_mxbai
     else:
         raise ValueError(f"Invalid option: {option}")
 
@@ -55,6 +58,13 @@ def get_text_embedding_bge_m3(text):
     """                                                                                                                                                                                  
     embedding = bge_m3_model.encode(text)  # shape (D,), returns 1024-dim                                                                                                                
     return embedding  
+
+def get_text_embedding_mxbai(text):
+    """
+    Get text embedding with mxbai-embed-large-v1 model
+    """
+    embedding = mxbai_model.encode(text)  # shape (D,), returns 1024-dim
+    return embedding
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
