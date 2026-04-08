@@ -12,10 +12,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
-from sentence_transformers import SentenceTransformer
 sentence_transformer_model = SentenceTransformer("all-MiniLM-L6-v2")
 bge_m3_model = SentenceTransformer("BAAI/bge-m3") 
 mxbai_model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1")
+qwen3_vl_model = SentenceTransformer("Qwen/Qwen3-VL-Embedding-2B")
 
 
 ##############################################
@@ -33,8 +33,15 @@ def get_text_embedding_options(option="embeddings_oai"):
         return get_text_embedding_bge_m3 
     elif option == "embeddings_mxbai":
         return get_text_embedding_mxbai
+    elif option == "embeddings_qwen3_vl":
+        return get_text_embedding_qwen3_vl
     else:
         raise ValueError(f"Invalid option: {option}")
+
+def get_text_embedding_qwen3_vl(text):
+    embedding = qwen3_vl_model.encode(text)  # shape (D,), returns 2048-dim
+    # MRL: truncate to 1024
+    return embedding[:1024]
 
 def get_text_embedding(text, model="text-embedding-3-large", dim=1024):
     """
