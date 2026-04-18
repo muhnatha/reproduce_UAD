@@ -442,7 +442,7 @@ if __name__ == "__main__":
     parser.add_argument("--categories", nargs='+', default=None,
                         help="Categories to use (default: all)")
     parser.add_argument("--embedding_type", type=str, default="embeddings_oai",
-                        choices=["embeddings_oai", "embeddings_st", "embeddings_bge_m3"],
+                        choices=["embeddings_oai", "embeddings_st", "embeddings_bge_m3", "embeddings_qwen3_vl"],
                         help="Which embedding type to use")
     parser.add_argument("--n_show", type=int, default=1,
                         help="Number of samples to visualize")

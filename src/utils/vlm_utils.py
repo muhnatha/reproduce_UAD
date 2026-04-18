@@ -1,7 +1,7 @@
 """
 Utility functions for VLM
 """
-from openai import OpenAI
+#from openai import OpenAI
 
 import os
 import ast
@@ -12,6 +12,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
+from sentence_transformers import SentenceTransformer
 sentence_transformer_model = SentenceTransformer("all-MiniLM-L6-v2")
 bge_m3_model = SentenceTransformer("BAAI/bge-m3") 
 mxbai_model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1")
